@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from "typeorm"
+import { Attempt } from "./Attempt"
 
 @Entity()
 export class User extends BaseEntity {
@@ -9,4 +10,6 @@ export class User extends BaseEntity {
     @Column()
     username: string;
 
+    @OneToMany(() => Attempt, attempt => attempt.user)
+    attempts: Attempt[];
 }
