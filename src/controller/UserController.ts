@@ -1,51 +1,32 @@
-import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
+import { asyncHandler } from "../utils";
 import { User } from "../entity/User";
 
 export class UserController {
-  private userRepository = AppDataSource.getRepository(User);
 
-  async all(request: Request, response: Response, next: NextFunction) {
-    return this.userRepository.find();
-  }
+    createUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+        const { username } = req.body;
+        const user = new User();
+        user.username = username;
+        await user.save();
+        return res.status(201).json(user);
+    })
 
-  async one(request: Request, response: Response, next: NextFunction) {
-    const id = parseInt(request.params.id);
-
-    const user = await this.userRepository.findOne({
-      where: { id },
+    getAllUsers = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+        const users = await User.find();
+        return res.status(200).json(users);
     });
 
-    if (!user) {
-      throw new Error("user not found");
-    }
-    
-    return user;
-  }
-
-  async save(request: Request, response: Response, next: NextFunction) {
-    const { firstName, lastName, age } = request.body;
-
-    const user = Object.assign(new User(), {
-      firstName,
-      lastName,
-      age,
-    });
-
-    return this.userRepository.save(user);
-  }
-
-  async remove(request: Request, response: Response, next: NextFunction) {
-    const id = parseInt(request.params.id);
-
-    const userToRemove = await this.userRepository.findOneBy({ id });
-
-    if (!userToRemove) {
-      throw new Error("user not found");
-    }
-
-    await this.userRepository.remove(userToRemove);
-
-    return "user has been removed";
-  }
+    getUserById = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.params;
+        const user = await User.findOne({
+            where: {
+                id,
+            },
+        });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        return res.status(200).json(user);
+    })
 }
