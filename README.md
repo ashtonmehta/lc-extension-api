@@ -1,4 +1,6 @@
 # LC Chrome Extension API
+Tech Stack: Node.js, Express, TypeORM, PostgreSQL
+
 Requirements:
 1. Node.js
 2. Docker
