@@ -3,6 +3,8 @@ import * as bodyParser from "body-parser";
 import * as morgan from "morgan";
 import { Request, Response, NextFunction } from "express";
 import userRouter from "./routes/user";
+import problemRouter from "./routes/problem";
+import attemptRouter from "./routes/attempt";
 
 function handleError(err: any, req: Request, res: Response, next: NextFunction) {
   res.status(err.status || 500).send({ message: err.message });
@@ -19,6 +21,8 @@ app.use(bodyParser.json());
 
 // register all application routes
 app.use("/users", userRouter);
+app.use("/problems", problemRouter);
+app.use("/attempts", attemptRouter);
 
 // Error handling middleware
 app.use(handleNotFound);

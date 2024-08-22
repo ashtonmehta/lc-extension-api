@@ -1,15 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler } from "../utils";
 import { User } from "../entity/User";
+import { UserService } from "../service/UserService";
 
 export class UserController {
 
     createUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
         const { username } = req.body;
-        const user = new User();
-        user.username = username;
-        await user.save();
-        return res.status(201).json(user);
+
+        const newUser = await UserService.createUser(username);
+
+        return res.status(201).json(newUser);
     })
 
     getAllUsers = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
