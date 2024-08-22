@@ -1,12 +1,13 @@
-# Awesome Project Build with TypeORM
+# LC Chrome Extension API
+Requirements:
+1. Node.js
+2. Docker
 
 Steps to run this project:
 
 1. Run `npm i` command
 2. Setup database settings inside `data-source.ts` file
-3. Run `npm start` command
-
-Other notes:
-1. Set up .env file with the variables contained in `config.ts`.
-2. `docker compose up -d` to start the database
-3. `docker compose down` to stop the database
+3. Set up .env file with the variables contained in `config.ts`.
+4. `docker compose up -d` to start the database
+5. Run `npm run dev` command
+6. `docker compose down` to stop the database (when you're done)
