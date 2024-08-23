@@ -2,7 +2,7 @@ import { Attempt, AttemptStatus } from "../entity/Attempt";
 import { Problem } from "../entity/Problem";
 import { User } from "../entity/User";
 
-class AttemptService {
+export class AttemptService {
   async createAttempt(
     user: User,
     problem: Problem,
@@ -18,7 +18,21 @@ class AttemptService {
     return attempt;
   }
 
-}
+  async getAllAttempts(): Promise<Attempt[]> {
+    const attempts = await Attempt.find({
+      where: {},
+      relations: ["user", "problem"],
+    });
+    return attempts;
+  }
 
-const attemptService = new AttemptService();
-export { attemptService as AttemptService };
+  async getAttemptsByUsername(user: User): Promise<Attempt[]> {
+    const attempts = await Attempt.find({
+      where: {
+        user,
+      },
+      relations: ["user", "problem"],
+    });
+    return attempts;
+  }
+}

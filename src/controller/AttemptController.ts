@@ -1,65 +1,62 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler } from "../utils";
-import { Attempt } from "../entity/Attempt";
-import { User } from "../entity/User";
-import { Problem } from "../entity/Problem";
 import { ProblemService } from "../service/ProblemService";
 import { AttemptService } from "../service/AttemptService";
+import { UserService } from "../service/UserService";
 
 export class AttemptController {
+    private attemptService = new AttemptService();
+    private userService = new UserService();
+    private problemService = new ProblemService();
+
     createAttempt = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
         const { username, problemName, status, date } = req.body;
 
-        const user = await User.findOne({
-            where: {
-                username,
-            },
-        });
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        if (!username || !problemName || !status || !date) {
+            return res.status(400).json({ message: 'username, problemName, status, date are required' });
         }
 
-        let problem = await Problem.findOne({
-            where: {
-                name: problemName,
-            },
-        });
+        if (status !== 'MASTERED' && status !== 'NEEDED_HINT' && status !== 'NEEDED_SOLUTION') {
+            return res.status(400).json({ message: 'status must be MASTERED, NEEDED_HINT, or NEEDED_SOLUTION' });
+        }
+
+        const user = await this.userService.getUserByUsername(username);
+
+        if (!user) {
+            return res.status(404).json({ message: `User with username ${username} not found` });
+        }
+
+        let problem = await this.problemService.getProblemByName(problemName);
 
         if (!problem) {
-            problem = await ProblemService.createProblem(problemName);
+            problem = await this.problemService.createProblem(problemName);
         }
 
         const newDate = new Date(date);
         
-        const newAttempt = await AttemptService.createAttempt(user, problem, status, newDate);
+        const newAttempt = await this.attemptService.createAttempt(user, problem, status, newDate);
         
         return res.status(201).json(newAttempt);
     });
 
     getAllAttempts = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-        const attempts = await Attempt.find();
+        const attempts = await this.attemptService.getAllAttempts();
         return res.status(200).json(attempts);
     });
 
     getAttemptsByUsername = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
         const { username } = req.params;
-        const user = await User.findOne({
-            where: {
-                username,
-            },
-        });
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        if (!username) {
+            return res.status(400).json({ message: 'username is required' });
         }
 
-        const attempts = await Attempt.find({
-            where: {
-                user,
-            },
-            relations: ['user', 'problem'],
-        });
+        const user = await this.userService.getUserByUsername(username);
+
+        if (!user) {
+            return res.status(404).json({ message: `User with username ${username} not found` });
+        }
+
+        const attempts = await this.attemptService.getAttemptsByUsername(user);
 
         return res.status(200).json(attempts);
     });

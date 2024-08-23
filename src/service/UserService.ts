@@ -1,6 +1,31 @@
 import { User } from '../entity/User';
 
-class UserService {
+export class UserService {
+
+    async getUserById(id: string): Promise<User | null> {
+        const user = await User.findOne({
+            where: {
+                id: parseInt(id),
+            },
+        });
+        return user || null;
+    }
+
+    async getAllUsers(): Promise<User[]> {
+        const users = await User.find();
+        return users
+    }
+
+    async getUserByUsername(username: string): Promise<User | null> {
+        const user = await User.findOne({
+            where: {
+                username,
+            },
+        });
+        
+        return user || null;
+    }
+
 
     async createUser(username: string): Promise<User | null> {
         const usersWithSameUsername = await User.find({
@@ -20,6 +45,3 @@ class UserService {
         return user;
     }
 }
-
-const userService = new UserService();
-export { userService as UserService };

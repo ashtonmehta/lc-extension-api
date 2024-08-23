@@ -1,21 +1,25 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler } from "../utils";
 import { ProblemService } from "../service/ProblemService";
-import { User } from "../entity/User";
-import { Problem } from "../entity/Problem";
-
+import { UserService } from "../service/UserService";
 
 export class ProblemController {
+    private problemService = new ProblemService();
+    private userService = new UserService();
 
     getAllProblems = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-        const problems = await Problem.find();
+        const problems = await this.problemService.getAllProblems();
         return res.status(200).json(problems);
     });
 
     createProblem = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
         const { name } = req.body;
 
-        const newProblem = await ProblemService.createProblem(name);
+        if (!name) {
+            return res.status(400).json({ message: 'name is required' });
+        }
+
+        const newProblem = await this.problemService.createProblem(name);
 
         if (!newProblem) {
             return res.status(400).json({ message: 'Problem already exists' });
@@ -27,17 +31,17 @@ export class ProblemController {
     getTodayProblemsForUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
         const { username } = req.params;
 
-        const user = await User.findOne({
-            where: {
-                username,
-            },
-        });
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        if (!username) {
+            return res.status(400).json({ message: 'username is required' });
         }
 
-        const todayProblems = await ProblemService.getTodayProblemsForUser(user);
+        const user = await this.userService.getUserByUsername(username);
+
+        if (!user) {
+            return res.status(404).json({ message: `User with username ${username} not found` });
+        }
+
+        const todayProblems = await this.problemService.getTodayProblemsForUser(user);
 
         return res.status(200).json(todayProblems);
     });

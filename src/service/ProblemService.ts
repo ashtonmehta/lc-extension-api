@@ -5,9 +5,23 @@ import { Attempt } from '../entity/Attempt';
 import { addDays, addMonths, addWeeks, isBefore } from 'date-fns';
 
 
-class ProblemService {
+export class ProblemService {
 
-    async createProblem(name: string) {
+    async getProblemByName(name: string): Promise<Problem | null> {
+        const problem = await Problem.findOne({
+            where: {
+                name,
+            },
+        });
+
+        return problem || null;
+    }
+
+    async getAllProblems(): Promise<Problem[]> {
+        return await Problem.find();
+    }
+
+    async createProblem(name: string): Promise<Problem | null> {
         const problemsWithSameName = await Problem.find({
             where: {
                 name,
@@ -65,6 +79,3 @@ class ProblemService {
         return dueProblems;
     }
 }
-
-const problemService = new ProblemService();
-export { problemService as ProblemService };

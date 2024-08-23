@@ -6,7 +6,12 @@ import userRouter from "./routes/user";
 import problemRouter from "./routes/problem";
 import attemptRouter from "./routes/attempt";
 
-function handleError(err: any, req: Request, res: Response, next: NextFunction) {
+function handleError(
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   res.status(err.status || 500).send({ message: err.message });
 }
 
@@ -18,6 +23,11 @@ function handleNotFound(req: Request, res: Response) {
 const app = express();
 app.use(morgan("tiny"));
 app.use(bodyParser.json());
+
+// define a route handler for the default home page
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).send("<h1>LC API is Running!</h1>");
+});
 
 // register all application routes
 app.use("/users", userRouter);
