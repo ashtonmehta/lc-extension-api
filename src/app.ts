@@ -1,28 +1,20 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as morgan from "morgan";
+import * as cors from "cors";
 import { Request, Response, NextFunction } from "express";
 import userRouter from "./routes/user";
 import problemRouter from "./routes/problem";
 import attemptRouter from "./routes/attempt";
-
-function handleError(
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  res.status(err.status || 500).send({ message: err.message });
-}
-
-function handleNotFound(req: Request, res: Response) {
-  res.status(404).send({ message: "Not Found" });
-}
+import { handleError, handleNotFound } from "./middleware";
 
 // create express app
 const app = express();
 app.use(morgan("tiny"));
 app.use(bodyParser.json());
+
+// enable CORS fro all routes
+app.use(cors());
 
 // define a route handler for the default home page
 app.get("/", (req: Request, res: Response) => {

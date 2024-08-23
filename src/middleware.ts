@@ -10,3 +10,16 @@ export const validate = (req: Request, res: Response, next: NextFunction) => {
   }
   next();
 };
+
+export function handleError(
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  res.status(err.status || 500).send({ message: err.message });
+}
+
+export function handleNotFound(req: Request, res: Response) {
+  res.status(404).send({ message: "Not Found" });
+}
