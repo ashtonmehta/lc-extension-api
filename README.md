@@ -1,15 +1,50 @@
 # LC Chrome Extension API
-Tech Stack: Node.js, Express, TypeORM, PostgreSQL
 
-Requirements:
-1. Node.js
-2. Docker
+This is the API for the LC Chrome Extension project.
 
-Steps to run this project:
+## Tech Stack
 
-1. Run `npm i` command
-2. Setup database settings inside `data-source.ts` file
-3. Set up .env file with the variables contained in `config.ts`.
-4. `docker compose up -d` to start the database
-5. Run `npm run dev` command
-6. `docker compose down` to stop the database (when you're done)
+- **Node.js**
+- **Express**
+- **Express-Validator**
+- **TypeORM**
+- **PostgreSQL**
+
+## Requirements
+
+- **Node.js**
+- **Docker**
+
+## Setup Instructions
+
+### 1. Install Dependencies
+
+Run the `npm install` command
+
+### 2. Configure Database
+
+Edit the `data-source.ts` file to match your database settings
+
+### 3. Set Environment Variables
+
+Create a `.env` file in the root directory and add the following variables:
+
+```
+DB_USERNAME
+DB_PASSWORD
+POSTGRES_USER
+POSTGRES_PASSWORD
+PORT
+```
+
+### 4. Start the Database
+
+Run `docker compose up -d` to start the database
+
+### 5. Run the Development Server
+
+Run the `npm run dev` command
+
+### 6. Stop the Database
+
+Run `docker compose down` to stop the database (when you're done)
