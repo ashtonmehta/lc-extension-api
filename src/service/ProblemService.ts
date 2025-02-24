@@ -1,81 +1,81 @@
-import { Problem } from '../entity/Problem';
-import { User } from '../entity/User';
-import { AttemptStatus } from '../entity/Attempt';
-import { Attempt } from '../entity/Attempt';
-import { addDays, addMonths, addWeeks, isBefore } from 'date-fns';
-
+import { Problem } from "../entity/Problem";
+import { User } from "../entity/User";
+import { AttemptStatus } from "../entity/Attempt";
+import { Attempt } from "../entity/Attempt";
+import { addDays, addMonths, addWeeks, isBefore } from "date-fns";
 
 export class ProblemService {
+  async getProblemByName(name: string): Promise<Problem | null> {
+    const problem = await Problem.findOne({
+      where: {
+        name,
+      },
+    });
 
-    async getProblemByName(name: string): Promise<Problem | null> {
-        const problem = await Problem.findOne({
-            where: {
-                name,
-            },
-        });
+    return problem || null;
+  }
 
-        return problem || null;
+  async getAllProblems(): Promise<Problem[]> {
+    return await Problem.find();
+  }
+
+  async createProblem(name: string): Promise<Problem | null> {
+    const problemsWithSameName = await Problem.find({
+      where: {
+        name,
+      },
+    });
+
+    if (problemsWithSameName.length > 0) {
+      return null;
     }
 
-    async getAllProblems(): Promise<Problem[]> {
-        return await Problem.find();
+    const problem = new Problem();
+    problem.name = name;
+    problem.link = `https://leetcode.com/problems/${name}`;
+    await problem.save();
+
+    return problem;
+  }
+
+  async getDueProblemsForUser(user: User): Promise<Problem[]> {
+    const attempts = await Attempt.find({
+      where: {
+        user,
+      },
+      relations: ["problem"],
+    });
+
+    const dueProblems: Problem[] = [];
+
+    const today = new Date();
+    for (const attempt of attempts) {
+      const lastAttemptedDate = attempt.date;
+
+      switch (attempt.status) {
+        case AttemptStatus.MASTERED:
+          if (isBefore(addMonths(lastAttemptedDate, 1), today)) {
+            dueProblems.push(attempt.problem);
+          }
+          break;
+        case AttemptStatus.NEEDED_HINT:
+          if (isBefore(addWeeks(lastAttemptedDate, 1), today)) {
+            dueProblems.push(attempt.problem);
+          }
+          break;
+        case AttemptStatus.NEEDED_SOLUTION:
+          if (isBefore(addDays(lastAttemptedDate, 3), today)) {
+            console.log("Adding problem");
+            dueProblems.push(attempt.problem);
+          }
+          break;
+        case AttemptStatus.NOT_ATTEMPTED:
+          break;
+        default:
+          break;
+      }
     }
 
-    async createProblem(name: string): Promise<Problem | null> {
-        const problemsWithSameName = await Problem.find({
-            where: {
-                name,
-            },
-        });
-
-        if (problemsWithSameName.length > 0) {
-            return null;
-        }
-
-        const problem = new Problem();
-        problem.name = name;
-        problem.link = `https://leetcode.com/problems/${name}`;
-        await problem.save();
-
-        return problem;
-    }
-
-    async getTodayProblemsForUser(user: User): Promise<Problem[]> {
-        const attempts = await Attempt.find({
-            where: {
-                user,
-            },
-        });
-
-        const dueProblems: Problem[] = [];
-
-        const today = new Date();
-        for (const attempt of attempts) {
-            const lastAttemptedDate = attempt.date;
-
-            switch (attempt.status) {
-                case AttemptStatus.MASTERED:
-                    if (isBefore(addMonths(lastAttemptedDate, 1), today)) {
-                        dueProblems.push(attempt.problem);
-                    }
-                    break;
-                case AttemptStatus.NEEDED_HINT:
-                    if (isBefore(addWeeks(lastAttemptedDate, 1), today)) {
-                        dueProblems.push(attempt.problem);
-                    }
-                    break;
-                case AttemptStatus.NEEDED_SOLUTION:
-                    if (isBefore(addDays(lastAttemptedDate, 3), today)) {
-                        dueProblems.push(attempt.problem);
-                    }
-                    break;
-                case AttemptStatus.NOT_ATTEMPTED:
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        return dueProblems;
-    }
+    return dueProblems;
+  }
 }

@@ -19,6 +19,11 @@ export class ProblemController {
             return res.status(400).json({ message: 'name is required' });
         }
 
+        // Check if name has spaces
+        if (name.includes(' ')) {
+            return res.status(400).json({ message: 'name should not contain spaces' });
+        }
+
         const newProblem = await this.problemService.createProblem(name);
 
         if (!newProblem) {
@@ -28,7 +33,7 @@ export class ProblemController {
         return res.status(201).json(newProblem);
     });
 
-    getTodayProblemsForUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    getDueProblemsForUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
         const { username } = req.params;
 
         if (!username) {
@@ -41,8 +46,8 @@ export class ProblemController {
             return res.status(404).json({ message: `User with username ${username} not found` });
         }
 
-        const todayProblems = await this.problemService.getTodayProblemsForUser(user);
+        const dueProblems = await this.problemService.getDueProblemsForUser(user);
 
-        return res.status(200).json(todayProblems);
+        return res.status(200).json(dueProblems);
     });
 }

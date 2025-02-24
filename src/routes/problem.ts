@@ -5,7 +5,7 @@ import { validate } from "../middleware";
 
 const problemRouter = Router();
 
-const { createProblem, getAllProblems, getTodayProblemsForUser } =
+const { createProblem, getAllProblems, getDueProblemsForUser } =
   new ProblemController();
 
 problemRouter.post(
@@ -20,14 +20,14 @@ problemRouter.post(
 );
 problemRouter.get("/", getAllProblems);
 problemRouter.get(
-  "/todaysProblems/:username",
+  "/dueProblems/:username",
   param("username")
     .isString()
     .withMessage("username must be a string")
     .isLength({ min: 1 })
     .withMessage("username must be a positive length"),
   validate,
-  getTodayProblemsForUser
+  getDueProblemsForUser
 );
 
 export default problemRouter;

@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils";
 import { ProblemService } from "../service/ProblemService";
 import { AttemptService } from "../service/AttemptService";
 import { UserService } from "../service/UserService";
+import { AttemptStatus } from "../entity/Attempt";
 
 export class AttemptController {
     private attemptService = new AttemptService();
@@ -16,7 +17,7 @@ export class AttemptController {
             return res.status(400).json({ message: 'username, problemName, status, date are required' });
         }
 
-        if (status !== 'MASTERED' && status !== 'NEEDED_HINT' && status !== 'NEEDED_SOLUTION') {
+        if (status !== AttemptStatus.MASTERED && status !== AttemptStatus.NEEDED_HINT && status !== AttemptStatus.NEEDED_SOLUTION) {
             return res.status(400).json({ message: 'status must be MASTERED, NEEDED_HINT, or NEEDED_SOLUTION' });
         }
 
